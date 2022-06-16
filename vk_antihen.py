@@ -6,7 +6,7 @@ from config import token
 from friendlist import friendlist
 
 delay_sec = 55
-auto_accept = 2  # 0 = ask, 1 = keep as followers,		2 = add to friendlist
+auto_accept = 1  # 0 = ask, 1 = keep as followers,		2 = add to friendlist
 auto_delete = 2  # 0 = ask, 1 = del me from followers, 	2 = ban unfriendler
 
 vk_session = vk_api.VkApi(token=token)
@@ -159,7 +159,7 @@ while True:
                     follower_user_data['first_name']) + ' ' + str(follower_user_data['last_name']) + '\n')
                 f.close()
 
-                f = open('vk_antihen_ignored.log', 'a')
+                f = open('vk_antihen_request.log', 'a')
                 f.write('\n' + str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M:%S')) + '\n')
                 f.write('REQUEST DELETED: ' + 'ID: ' + str(follower_user_data['id']) + ' | Closed: ' + str(
                     follower_user_data['is_closed']) + ' | Access: ' + str(
