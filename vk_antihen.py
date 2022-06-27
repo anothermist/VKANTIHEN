@@ -6,8 +6,8 @@ from config import token
 from friendlist import friendlist
 
 delay_sec = 55
-auto_accept = 1  # 0 = ask, 1 = keep as followers,		2 = add to friendlist
-auto_delete = 2  # 0 = ask, 1 = del me from followers, 	2 = ban unfriendler
+auto_accept = 0  # 0 = no to do, 1 = log, keep as follower,	2 = add to friendlist
+auto_delete = 2  # 0 = log-only, 1 = del me from followers, 2 = ban unfriendler
 
 vk_session = vk_api.VkApi(token=token)
 vk = vk_session.get_api()
@@ -72,12 +72,20 @@ while True:
                             f.close()
 
                         else:
-                            how_to_del = 0
-
                             if auto_delete == 0:
-                                how_to_del = int(input('0 = DON\'T UNFOLLOW, 1 = UNFOLLOW, 2 = ADD TO BLACKLIST '))
+                                print('LEAVER: ' + str(userinfo['id']) + ' | Closed: ' + str(
+                                    userinfo['is_closed']) + ' | Access: ' + str(
+                                    userinfo['can_access_closed']) + ' | ' + str(userinfo['first_name']) + ' ' + str(
+                                    userinfo['last_name']))
+                                f = open('vk_antihen_leaver.log', 'a')
+                                f.write('\n' + str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M:%S')) + '\n')
+                                f.write('LEAVER: ' + str(userinfo['id']) + ' | Closed: ' + str(
+                                    userinfo['is_closed']) + ' | Access: ' + str(
+                                    userinfo['can_access_closed']) + ' | ' + str(userinfo['first_name']) + ' ' + str(
+                                    userinfo['last_name']) + '\n\n')
+                                f.close()
 
-                            if auto_delete == 1 or how_to_del == 1:
+                            if auto_delete == 1:
                                 vk.friends.delete(user_id=friends_was['items'][count])
                                 print('REMOVED: ' + str(userinfo['id']) + ' | Closed: ' + str(
                                     userinfo['is_closed']) + ' | Access: ' + str(
@@ -91,7 +99,7 @@ while True:
                                     userinfo['last_name']) + '\n\n')
                                 f.close()
 
-                            if auto_delete == 2 or how_to_del == 2:
+                            if auto_delete == 2:
                                 vk.account.ban(owner_id=friends_was['items'][count])
                                 print('BLOCKED: ' + str(userinfo['id']) + ' | Closed: ' + str(
                                     userinfo['is_closed']) + ' | Access: ' + str(
@@ -123,7 +131,7 @@ while True:
 
         followers = vk.friends.getRequests()
 
-        if int(followers['count']) > 0:
+        if int(followers['count']) > 0 and auto_accept != 0:
             print('NEW REQUEST: ' + str(followers))
             follower_user_data = vk.users.get(user_id=followers['items'])[-1]
             print(str(follower_user_data['id']) + ' | Closed: ' + str(
@@ -139,12 +147,7 @@ while True:
                 follower_user_data['last_name']) + '\n')
             f.close()
 
-            how_to_add = 0
-
-            if auto_accept == 0:
-                how_to_add = int(input('1 = KEEP AS FOLLOWER, 2 = ADD TO FRIENDLIST '))
-
-            if auto_accept == 1 or how_to_add == 1:
+            if auto_accept == 1:
                 vk.friends.delete(user_id=followers['items'])
                 print('REQUEST DELETED: ' + 'ID: ' + str(follower_user_data['id']) + ' | Closed: ' + str(
                     follower_user_data['is_closed']) + ' | Access: ' + str(
@@ -167,7 +170,7 @@ while True:
                     follower_user_data['first_name']) + ' ' + str(follower_user_data['last_name']) + '\n')
                 f.close()
 
-            if auto_accept == 2 or how_to_add == 2:
+            if auto_accept == 2:
                 vk.friends.add(user_id=followers['items'])
                 print('ADDED TO FRIENDLIST: ' + 'ID: ' + str(follower_user_data['id']) + ' | Closed: ' + str(
                     follower_user_data['is_closed']) + ' | Access: ' + str(
@@ -192,7 +195,8 @@ while True:
 
                 exit()
 
-        vk.status.set(text=str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M:%S')) + ' | add=' + str(auto_accept) + ', del=' + str(auto_delete) + ' | ' + str(friends_now['count']))
+        vk.status.set(text=str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M:%S')) + ' | add=' + str(
+            auto_accept) + ', del=' + str(auto_delete) + ' | ' + str(friends_now['count']))
 
         time.sleep(delay_sec)
     except Exception as e:
