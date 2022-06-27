@@ -6,7 +6,7 @@ from config import token
 from friendlist import friendlist
 
 delay_sec = 55
-auto_accept = 0  # 0 = no to do, 1 = log, keep as follower,	2 = add to friendlist
+auto_accept = 0  # 0 = no to do, 1 = log, keep as follower, 2 = add to friendlist
 auto_delete = 2  # 0 = log-only, 1 = del me from followers, 2 = ban unfriendler
 
 vk_session = vk_api.VkApi(token=token)
