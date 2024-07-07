@@ -3,6 +3,7 @@ import time
 import vk_api
 
 from config import token
+from config import group
 from friendlist import friendlist
 
 delay_sec = 55
@@ -16,9 +17,6 @@ while True:
     try:
         vk_status_was = vk.status.get()
         print(str(vk_status_was['text']))
-        f = open('vk_antihen.log', 'a')
-        f.write(str(vk_status_was['text']) + '\n')
-        f.close()
 
         friends_now = vk.friends.get()
         friends_was = friendlist
@@ -48,7 +46,7 @@ while True:
             if int(friends_was['count']) > int(friends_now['count']):
 
                 count = 0
-                while count < friends_was['count']:
+                while count < int(friends_was['count']):
                     if friends_was['items'][count] != friends_now['items'][count]:
                         userinfo = vk.users.get(fields='blacklisted', user_id=friends_was['items'][count])[0]
                         print('LEFT ME: ' + str(userinfo['id']) + ' | Closed: ' + str(
@@ -186,7 +184,7 @@ while True:
                 f.close()
 
                 f = open('vk_antihen_added.log', 'a')
-                f.write('\n' + str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M:%S')) + '\n')
+                f.write('\n' + str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M')) + '\n')
                 f.write('ADDED TO FRIENDLIST: ' + 'ID: ' + str(follower_user_data['id']) + ' | Closed: ' + str(
                     follower_user_data['is_closed']) + ' | Access: ' + str(
                     follower_user_data['can_access_closed']) + ' | ' + str(
@@ -195,8 +193,10 @@ while True:
 
                 exit()
 
-        vk.status.set(text=str(datetime.datetime.now().strftime('%d.%m.%y - %H:%M:%S')) + ' | add=' + str(
-            auto_accept) + ', del=' + str(auto_delete) + ' | ' + str(friends_now['count']))
+        vk.status.set(text=str(datetime.datetime.now().strftime('Слившимся из френдлиста - автоматический бан! ' + 'Updated: %H:%M %d.%m.%y')) + ' | AutoAdd=' + str(
+            auto_accept) + ', AutoDel=' + str(auto_delete) + ' | ' + str(friends_now['count']))
+
+
 
         time.sleep(delay_sec)
     except Exception as e:
